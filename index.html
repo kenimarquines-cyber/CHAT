@@ -3,135 +3,581 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat Prototipo</title>
+<title>Macarena Bar — Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --green: #25D366;
-    --green-dark: #128C7E;
-    --gray-light: #ece5dd;
-    --gray-dark: #dcf8c6;
-    --bg: #f0f0f0;
-    --text: #000;
+    --gold:        #c9a84c;
+    --gold-light:  #e2c97e;
+    --gold-dim:    rgba(201,168,76,0.18);
+    --glass:       rgba(10, 8, 6, 0.72);
+    --glass-msg:   rgba(255,255,255,0.05);
+    --sent-bg:     rgba(201,168,76,0.22);
+    --recv-bg:     rgba(255,255,255,0.07);
+    --border:      rgba(201,168,76,0.25);
+    --text:        #f0ead8;
+    --text-muted:  #9e9688;
+    --radius:      18px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Segoe UI', sans-serif;
-    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-  }
-
-  .chat-window {
-    width: 100%;
-    max-width: 420px;
-    height: 90vh;
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #ccc;
-    border-radius: 8px;
     overflow: hidden;
   }
 
+  /* ── FONDO ── cambia la URL por tu imagen */
+  .bg {
+    position: fixed;
+    inset: 0;
+    background:
+      linear-gradient(160deg, rgba(0,0,0,0.78) 0%, rgba(5,3,2,0.88) 100%),
+      url('TU_IMAGEN_AQUI') center/cover no-repeat;
+    z-index: 0;
+  }
+
+  /* partículas de ambiente */
+  .bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 40% at 20% 80%, rgba(201,168,76,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 80% 20%, rgba(201,168,76,0.05) 0%, transparent 70%);
+  }
+
+  /* ── PANTALLA DE ACCESO ── */
+  .access-screen {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 380px;
+    padding: 20px;
+  }
+
+  .access-card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 44px 36px 40px;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
+    text-align: center;
+  }
+
+  .brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 2rem;
+    letter-spacing: 6px;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .brand-sub {
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 36px;
+  }
+
+  .divider {
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    margin: 0 auto 32px;
+    opacity: 0.5;
+  }
+
+  .field-label {
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    text-align: left;
+    margin-bottom: 8px;
+    margin-top: 18px;
+  }
+
+  .field-label:first-of-type { margin-top: 0; }
+
+  .access-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .access-input::placeholder { color: rgba(240,234,216,0.25); }
+
+  .access-input:focus {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.07);
+  }
+
+  .role-select {
+    display: flex;
+    gap: 10px;
+    margin-top: 0;
+  }
+
+  .role-btn {
+    flex: 1;
+    padding: 11px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .role-btn.active {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+    color: var(--gold-light);
+  }
+
+  .enter-btn {
+    width: 100%;
+    margin-top: 30px;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--gold) 0%, #a87c2a 100%);
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #1a1200;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+
+  .enter-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .enter-btn:active { transform: translateY(0); }
+
+  .error-msg {
+    font-size: 0.75rem;
+    color: #e06060;
+    margin-top: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .error-msg.show { opacity: 1; }
+
+  /* ── VENTANA DE CHAT ── */
+  .chat-wrap {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 440px;
+    height: 92vh;
+    display: none;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
+    background: var(--glass);
+  }
+
+  .chat-wrap.visible { display: flex; }
+
+  /* Header */
+  .chat-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.3);
+    flex-shrink: 0;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    color: var(--gold-light);
+    flex-shrink: 0;
+  }
+
+  .header-info { flex: 1; }
+
+  .header-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 1px;
+  }
+
+  .header-role {
+    font-size: 0.68rem;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4caf50;
+    box-shadow: 0 0 6px #4caf50;
+    flex-shrink: 0;
+  }
+
+  /* Mensajes */
   .messages {
     flex: 1;
-    padding: 12px;
+    padding: 20px 16px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    background: var(--gray-light);
+    gap: 10px;
   }
 
-  .msg {
-    max-width: 70%;
-    padding: 8px 12px;
-    border-radius: 16px;
+  .messages::-webkit-scrollbar { width: 3px; }
+  .messages::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
+
+  /* Separador de fecha */
+  .date-sep {
+    text-align: center;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin: 6px 0;
+    position: relative;
+  }
+
+  .date-sep::before, .date-sep::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 28%;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .date-sep::before { left: 0; }
+  .date-sep::after  { right: 0; }
+
+  /* Burbuja */
+  .msg-row { display: flex; flex-direction: column; max-width: 72%; }
+  .msg-row.sent { align-self: flex-end; align-items: flex-end; }
+  .msg-row.recv { align-self: flex-start; align-items: flex-start; }
+
+  .msg-sender {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    padding: 0 4px;
+  }
+
+  .msg-bubble {
+    padding: 10px 15px;
+    border-radius: var(--radius);
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--text);
     word-break: break-word;
-    font-size: 14px;
+    position: relative;
   }
 
-  .sent { background: var(--green-dark); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
-  .recv { background: var(--gray-dark); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .sent .msg-bubble {
+    background: var(--sent-bg);
+    border: 1px solid rgba(201,168,76,0.35);
+    border-bottom-right-radius: 4px;
+  }
 
+  .recv .msg-bubble {
+    background: var(--recv-bg);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-bottom-left-radius: 4px;
+  }
+
+  .msg-time {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    padding: 0 4px;
+  }
+
+  /* Input area */
   .input-area {
     display: flex;
-    padding: 8px;
-    border-top: 1px solid #ccc;
-    gap: 6px;
-    background: #fff;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.25);
+    flex-shrink: 0;
   }
 
   #msg-input {
     flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    font-size: 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text);
     outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+    height: 44px;
+    line-height: 1.4;
   }
+
+  #msg-input::placeholder { color: rgba(240,234,216,0.22); }
+  #msg-input:focus { border-color: rgba(201,168,76,0.55); }
 
   #send-btn {
-    background: var(--green);
-    color: #fff;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
+    background: linear-gradient(135deg, var(--gold) 0%, #a87c2a 100%);
     cursor: pointer;
-    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.2s, transform 0.15s;
   }
 
-  /* Scroll suave */
-  .messages::-webkit-scrollbar { width: 4px; }
-  .messages::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
+  #send-btn:hover { opacity: 0.85; transform: scale(1.05); }
+  #send-btn:active { transform: scale(0.97); }
+
+  #send-btn svg { width: 18px; height: 18px; fill: #1a1200; }
+
+  /* Animación entrada mensaje */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg-row { animation: fadeUp 0.22s ease; }
 
 </style>
 </head>
 <body>
 
-<div class="chat-window">
-  <div class="messages" id="messages">
-    <!-- Mensajes se agregarán aquí -->
-  </div>
-  <div class="input-area">
-    <input type="text" id="msg-input" placeholder="Escribe un mensaje..." />
-    <button id="send-btn">➤</button>
+<div class="bg"></div>
+
+<!-- ── PANTALLA DE ACCESO ── -->
+<div class="access-screen" id="access-screen">
+  <div class="access-card">
+
+    <div class="brand">Macarena</div>
+    <div class="brand-sub">Bar &nbsp;·&nbsp; Chat</div>
+    <div class="divider"></div>
+
+    <div class="field-label">Tu numero</div>
+    <input class="access-input" id="my-number" type="tel" placeholder="+57 300 000 0000" />
+
+    <div class="field-label">Numero del otro usuario</div>
+    <input class="access-input" id="other-number" type="tel" placeholder="+57 310 000 0000" />
+
+    <div class="field-label">Acceder como</div>
+    <div class="role-select">
+      <button class="role-btn active" id="role-client" onclick="selectRole('cliente')">Cliente</button>
+      <button class="role-btn"        id="role-vendor" onclick="selectRole('vendedor')">Vendedor</button>
+    </div>
+
+    <button class="enter-btn" onclick="enterChat()">Ingresar al chat</button>
+    <div class="error-msg" id="error-msg">Por favor completa todos los campos</div>
+
   </div>
 </div>
 
-<script>
-  const input = document.getElementById('msg-input');
-  const sendBtn = document.getElementById('send-btn');
-  const messages = document.getElementById('messages');
+<!-- ── VENTANA DE CHAT ── -->
+<div class="chat-wrap" id="chat-wrap">
 
-  function scrollBottom() {
-    messages.scrollTop = messages.scrollHeight;
+  <div class="chat-header">
+    <div class="avatar" id="other-avatar">—</div>
+    <div class="header-info">
+      <div class="header-name" id="header-name">—</div>
+      <div class="header-role" id="header-role">—</div>
+    </div>
+    <div class="status-dot"></div>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="date-sep">Hoy</div>
+  </div>
+
+  <div class="input-area">
+    <input type="text" id="msg-input" placeholder="Escribe un mensaje..." />
+    <button id="send-btn">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      </svg>
+    </button>
+  </div>
+
+</div>
+
+<script>
+  // ── Estado global ──
+  let myNumber    = '';
+  let otherNumber = '';
+  let myRole      = 'cliente';
+  let chatKey     = '';
+
+  // ── Selección de rol ──
+  function selectRole(role) {
+    myRole = role;
+    document.getElementById('role-client').classList.toggle('active', role === 'cliente');
+    document.getElementById('role-vendor').classList.toggle('active', role === 'vendedor');
   }
 
-  function sendMessage() {
-    const text = input.value.trim();
-    if(!text) return;
-    
-    const msgDiv = document.createElement('div');
-    msgDiv.className = 'msg sent';
-    msgDiv.textContent = text;
-    
-    messages.appendChild(msgDiv);
-    input.value = '';
+  // ── Entrar al chat ──
+  function enterChat() {
+    myNumber    = document.getElementById('my-number').value.trim();
+    otherNumber = document.getElementById('other-number').value.trim();
+
+    if (!myNumber || !otherNumber) {
+      const err = document.getElementById('error-msg');
+      err.classList.add('show');
+      setTimeout(() => err.classList.remove('show'), 3000);
+      return;
+    }
+
+    // Clave compartida (igual sin importar el orden de los números)
+    const nums = [myNumber, otherNumber].sort();
+    chatKey = `chat_${nums[0]}_${nums[1]}`;
+
+    // Header
+    const initials = otherNumber.replace(/\D/g,'').slice(-2);
+    document.getElementById('other-avatar').textContent = initials || '—';
+    document.getElementById('header-name').textContent  = otherNumber;
+    document.getElementById('header-role').textContent  =
+      myRole === 'cliente' ? 'Vendedor' : 'Cliente';
+
+    // Mostrar chat
+    document.getElementById('access-screen').style.display = 'none';
+    const wrap = document.getElementById('chat-wrap');
+    wrap.classList.add('visible');
+
+    loadMessages();
+
+    // Polling cada 2 segundos para mensajes nuevos
+    setInterval(loadMessages, 2000);
+  }
+
+  // ── Guardar/Leer mensajes en localStorage (simula base de datos) ──
+  function getMessages() {
+    try { return JSON.parse(localStorage.getItem(chatKey)) || []; }
+    catch(e) { return []; }
+  }
+
+  function saveMessages(msgs) {
+    localStorage.setItem(chatKey, JSON.stringify(msgs));
+  }
+
+  // ── Renderizar mensajes ──
+  let lastCount = 0;
+
+  function loadMessages() {
+    const msgs = getMessages();
+    if (msgs.length === lastCount) return; // sin cambios
+    lastCount = msgs.length;
+
+    const container = document.getElementById('messages');
+
+    // Conserva el separador de fecha, borra el resto
+    const sep = container.querySelector('.date-sep');
+    container.innerHTML = '';
+    if (sep) container.appendChild(sep);
+
+    msgs.forEach(m => {
+      const isMine = m.from === myNumber;
+      const row = document.createElement('div');
+      row.className = `msg-row ${isMine ? 'sent' : 'recv'}`;
+
+      const sender = document.createElement('div');
+      sender.className = 'msg-sender';
+      sender.textContent = isMine ? 'Tú' : m.role;
+
+      const bubble = document.createElement('div');
+      bubble.className = 'msg-bubble';
+      bubble.textContent = m.text;
+
+      const time = document.createElement('div');
+      time.className = 'msg-time';
+      time.textContent = m.time;
+
+      row.appendChild(sender);
+      row.appendChild(bubble);
+      row.appendChild(time);
+      container.appendChild(row);
+    });
+
     scrollBottom();
   }
 
-  sendBtn.addEventListener('click', sendMessage);
-  input.addEventListener('keydown', e => {
-    if(e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+  // ── Enviar mensaje ──
+  function sendMessage() {
+    const input = document.getElementById('msg-input');
+    const text  = input.value.trim();
+    if (!text) return;
+
+    const now  = new Date();
+    const time = now.getHours().toString().padStart(2,'0') + ':' +
+                 now.getMinutes().toString().padStart(2,'0');
+
+    const msgs = getMessages();
+    msgs.push({ from: myNumber, role: myRole, text, time });
+    saveMessages(msgs);
+
+    input.value = '';
+    loadMessages();
+  }
+
+  function scrollBottom() {
+    const m = document.getElementById('messages');
+    m.scrollTop = m.scrollHeight;
+  }
+
+  // ── Eventos ──
+  document.getElementById('send-btn').addEventListener('click', sendMessage);
+  document.getElementById('msg-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   });
 </script>
 
