@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Macarena Bar — Live Chat</title>
+<title>Macarena Bar — Live Chat VIP</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
@@ -12,7 +12,7 @@
     --neon-cyan:   #46d2da;
     --neon-purple: #bc13fe;
     --neon-pink:   #ff00ff;
-    --glass:       rgba(5, 5, 5, 0.85);
+    --glass:       rgba(5, 5, 5, 0.9);
     --border:      rgba(70, 210, 218, 0.3);
     --text:        #ffffff;
     --text-muted:  #aaaaaa;
@@ -39,13 +39,6 @@
     z-index: 0;
   }
 
-  .bg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4); /* Oscurece un poco para leer mejor */
-  }
-
   /* PANTALLA DE ACCESO FULL SCREEN */
   .access-screen {
     position: relative;
@@ -55,7 +48,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.2);
   }
 
   .access-card {
@@ -66,70 +60,102 @@
     width: 90%;
     max-width: 400px;
     text-align: center;
-    box-shadow: 0 0 30px rgba(70, 210, 218, 0.2);
+    box-shadow: 0 0 40px rgba(70, 210, 218, 0.3);
+    animation: fadeIn 0.5s ease;
   }
+
+  @keyframes fadeIn { from {opacity:0; transform:scale(0.9);} to {opacity:1; transform:scale(1);} }
 
   .brand {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 2.5rem;
-    letter-spacing: 5px;
+    font-size: 2.8rem;
+    letter-spacing: 8px;
     color: var(--neon-cyan);
     text-transform: uppercase;
-    text-shadow: 0 0 10px var(--neon-cyan);
+    text-shadow: 0 0 15px var(--neon-cyan);
+    margin-bottom: 5px;
+  }
+
+  .my-id-container {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 12px;
+    margin: 20px 0;
+    border: 1px dashed var(--neon-purple);
+  }
+
+  .my-id-tag {
+    font-size: 0.75rem;
+    color: var(--neon-purple);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  #display-my-id {
+    font-weight: bold;
+    color: white;
+    word-break: break-all;
+    margin-top: 5px;
+    display: block;
+    font-size: 0.9rem;
   }
 
   .field-label {
     font-size: 0.7rem;
     letter-spacing: 2px;
-    color: var(--neon-purple);
+    color: var(--neon-cyan);
     text-transform: uppercase;
     text-align: left;
-    margin-top: 15px;
-    margin-bottom: 5px;
+    margin-top: 20px;
+    margin-bottom: 8px;
   }
 
   .access-input {
     width: 100%;
-    background: rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.5);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 12px;
+    padding: 14px;
     color: white;
     outline: none;
-    font-size: 1rem;
+    font-size: 0.9rem;
+    transition: 0.3s;
   }
 
-  .access-input:focus { border-color: var(--neon-pink); }
+  .access-input:focus { border-color: var(--neon-pink); box-shadow: 0 0 10px rgba(255, 0, 255, 0.2); }
 
   .role-select { display: flex; gap: 10px; margin-top: 10px; }
 
   .role-btn {
-    flex: 1; padding: 10px;
+    flex: 1; padding: 12px;
     background: rgba(255,255,255,0.05);
     border: 1px solid var(--border);
     border-radius: 10px;
     color: var(--text-muted);
     cursor: pointer;
-    text-transform: uppercase;
+    font-weight: bold;
+    transition: 0.3s;
   }
 
   .role-btn.active {
+    background: rgba(188, 19, 254, 0.2);
     border-color: var(--neon-purple);
     color: white;
-    box-shadow: 0 0 10px var(--neon-purple);
+    box-shadow: 0 0 15px var(--neon-purple);
   }
 
   .enter-btn {
     width: 100%;
-    margin-top: 25px;
-    padding: 15px;
+    margin-top: 30px;
+    padding: 16px;
     background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
     border: none;
     border-radius: 12px;
     color: white;
-    font-weight: bold;
-    letter-spacing: 2px;
+    font-weight: 900;
+    letter-spacing: 3px;
     cursor: pointer;
+    text-transform: uppercase;
   }
 
   /* VENTANA DE CHAT FULL SCREEN */
@@ -146,7 +172,7 @@
 
   .chat-header {
     padding: 20px;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.8);
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -156,119 +182,126 @@
   .avatar {
     width: 45px; height: 45px;
     border-radius: 50%;
-    border: 2px solid var(--neon-purple);
+    border: 2px solid var(--neon-cyan);
     display: flex; align-items: center; justify-content: center;
-    color: var(--neon-purple);
+    color: var(--neon-cyan);
     font-weight: bold;
+    text-shadow: 0 0 5px var(--neon-cyan);
   }
 
   .messages {
     flex: 1;
-    padding: 20px;
+    padding: 25px 20px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 18px;
+    background: rgba(0,0,0,0.2);
   }
 
-  /* Burbujas Neón */
-  .msg-row { max-width: 80%; display: flex; flex-direction: column; }
+  .msg-row { max-width: 85%; display: flex; flex-direction: column; animation: slideIn 0.3s ease; }
+  @keyframes slideIn { from {opacity:0; transform: translateY(10px);} to {opacity:1; transform: translateY(0);} }
+
   .msg-row.sent { align-self: flex-end; }
   .msg-row.recv { align-self: flex-start; }
 
   .msg-bubble {
-    padding: 12px 18px;
-    border-radius: 18px;
+    padding: 14px 20px;
+    border-radius: 20px;
     font-size: 0.95rem;
     color: white;
-    position: relative;
+    line-height: 1.4;
   }
 
   .sent .msg-bubble {
-    background: rgba(188, 19, 254, 0.2);
+    background: rgba(188, 19, 254, 0.25);
     border: 1px solid var(--neon-purple);
-    border-bottom-right-radius: 2px;
+    border-bottom-right-radius: 4px;
+    box-shadow: -5px 5px 15px rgba(188, 19, 254, 0.1);
   }
 
   .recv .msg-bubble {
-    background: rgba(70, 210, 218, 0.2);
+    background: rgba(70, 210, 218, 0.25);
     border: 1px solid var(--neon-cyan);
-    border-bottom-left-radius: 2px;
+    border-bottom-left-radius: 4px;
+    box-shadow: 5px 5px 15px rgba(70, 210, 218, 0.1);
   }
 
   .input-area {
-    padding: 20px;
+    padding: 25px;
     display: flex;
-    gap: 10px;
-    background: rgba(0,0,0,0.5);
+    gap: 12px;
+    background: rgba(0,0,0,0.9);
     border-top: 1px solid var(--border);
   }
 
   #msg-input {
     flex: 1;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.08);
     border: 1px solid var(--border);
-    padding: 15px;
-    border-radius: 12px;
+    padding: 16px;
+    border-radius: 15px;
     color: white;
     outline: none;
+    font-size: 1rem;
   }
 
   #send-btn {
-    width: 55px;
-    background: var(--neon-cyan);
+    width: 60px;
+    background: linear-gradient(135deg, var(--neon-cyan), #2aa8b0);
     border: none;
-    border-radius: 12px;
+    border-radius: 15px;
     cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.2s;
   }
 
-  .my-id-tag {
-    font-size: 0.8rem;
-    color: var(--neon-cyan);
-    margin-bottom: 10px;
-  }
-
+  #send-btn:hover { transform: scale(1.05); filter: brightness(1.2); }
 </style>
 </head>
 <body>
 
 <div class="bg"></div>
 
+<audio id="notif-sound" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"></audio>
+
 <div class="access-screen" id="access-screen">
   <div class="access-card">
     <div class="brand">MACARENA</div>
-    <div style="color: #666; font-size: 0.8rem; margin-bottom: 20px;">LIVE CONNECT</div>
-    
-    <div class="my-id-tag" id="display-my-id">Generando tu ID...</div>
-
-    <div class="field-label">ID del otro usuario (compañero)</div>
-    <input class="access-input" id="other-id" type="text" placeholder="Pega el ID aquí..." />
-
-    <div class="field-label">Entrar como</div>
-    <div class="role-select">
-      <button class="role-btn active" id="role-client" onclick="selectRole('cliente')">Cliente</button>
-      <button class="role-btn" id="role-vendor" onclick="selectRole('vendedor')">Vendedor</button>
+   
+    <div class="my-id-container">
+      <span class="my-id-tag">Tu ID de conexión</span>
+      <span id="display-my-id">Cargando protocolo...</span>
     </div>
 
-    <button class="enter-btn" onclick="connectToPeer()">CONECTAR AL CHAT</button>
+    <div class="field-label">ID de tu compañero</div>
+    <input class="access-input" id="other-id" type="text" placeholder="Pega el código aquí..." />
+
+    <div class="field-label">Ingresar como</div>
+    <div class="role-select">
+      <button class="role-btn active" id="role-client" onclick="selectRole('cliente')">CLIENTE</button>
+      <button class="role-btn" id="role-vendor" onclick="selectRole('vendedor')">VENDEDOR</button>
+    </div>
+
+    <button class="enter-btn" onclick="connectToPeer()">INICIAR CHAT EN VIVO</button>
   </div>
 </div>
 
 <div class="chat-wrap" id="chat-wrap">
   <div class="chat-header">
-    <div class="avatar" id="status-avatar">!!</div>
+    <div class="avatar" id="status-avatar">M</div>
     <div class="header-info">
-      <div id="chat-title" style="color:white; font-weight: bold;">Esperando conexión...</div>
-      <div id="chat-status" style="color:var(--neon-cyan); font-size: 0.7rem;">ONLINE</div>
+      <div id="chat-title" style="color:white; font-weight: bold; letter-spacing: 1px;">SISTEMA VIP</div>
+      <div id="chat-status" style="color:var(--neon-cyan); font-size: 0.7rem; font-weight: bold;">● CONECTADO</div>
     </div>
   </div>
 
   <div class="messages" id="messages"></div>
 
   <div class="input-area">
-    <input type="text" id="msg-input" placeholder="Escribe un mensaje VIP..." />
+    <input type="text" id="msg-input" placeholder="Escribe un mensaje..." autocomplete="off"/>
     <button id="send-btn" onclick="sendMessage()">
-      <svg viewBox="0 0 24 24" width="24" height="24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="black"/></svg>
+      <svg viewBox="0 0 24 24" width="28" height="28"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="white"/></svg>
     </button>
   </div>
 </div>
@@ -277,20 +310,17 @@
   let peer;
   let conn;
   let myRole = 'cliente';
-  let myId = '';
 
-  // 1. Inicializar PeerJS (Esto genera un ID único para tu navegador)
+  // 1. Inicializar PeerJS
   peer = new Peer();
 
   peer.on('open', (id) => {
-    myId = id;
-    document.getElementById('display-my-id').innerText = "Tu ID: " + id;
-    console.log('Mi ID es: ' + id);
+    document.getElementById('display-my-id').innerText = id;
   });
 
-  // 2. Escuchar cuando alguien se conecta a TI
-  peer.on('connection', (c) => {
-    conn = c;
+  // 2. Escuchar cuando ALGUIEN SE CONECTA A TI
+  peer.on('connection', (incomingConn) => {
+    conn = incomingConn;
     setupChat();
   });
 
@@ -303,42 +333,52 @@
   // 3. Conectar al compañero
   function connectToPeer() {
     const otherId = document.getElementById('other-id').value.trim();
-    if (!otherId) return alert("Pega el ID de tu compañero");
+    if (!otherId) return alert("Por favor, pega el ID de tu compañero.");
 
     conn = peer.connect(otherId);
-    setupChat();
+   
+    // Esperar a que la conexión esté abierta antes de mostrar el chat
+    conn.on('open', () => {
+      setupChat();
+    });
   }
 
   function setupChat() {
-    // Cambiar vista
+    // Cambiar de pantalla
     document.getElementById('access-screen').style.display = 'none';
-    document.getElementById('chat-wrap').style.display = 'flex';
-    document.getElementById('chat-title').innerText = myRole === 'cliente' ? "Hablando con Vendedor" : "Hablando con Cliente";
+    const wrap = document.getElementById('chat-wrap');
+    wrap.classList.add('visible');
+   
+    document.getElementById('chat-title').innerText = myRole === 'cliente' ? "VENDEDOR MACARENA" : "CLIENTE MACARENA";
 
-    // Escuchar mensajes
+    // Oído para recibir datos
     conn.on('data', (data) => {
       renderMsg(data, 'recv');
+      document.getElementById('notif-sound').play(); // Sonido al recibir
     });
 
-    conn.on('open', () => {
-      console.log("Conectado con éxito");
+    conn.on('close', () => {
+      alert("Tu compañero se ha desconectado.");
+      location.reload();
     });
   }
 
   function sendMessage() {
     const input = document.getElementById('msg-input');
     const text = input.value.trim();
-    if (!text || !conn) return;
+   
+    // Solo enviar si hay texto y la conexión está abierta
+    if (text && conn && conn.open) {
+      const msgData = {
+        text: text,
+        role: myRole,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
 
-    const msgData = {
-      text: text,
-      role: myRole,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    conn.send(msgData); // Enviamos por la red
-    renderMsg(msgData, 'sent'); // Lo pintamos en nuestra pantalla
-    input.value = '';
+      conn.send(msgData); // Enviar al otro
+      renderMsg(msgData, 'sent'); // Pintar en mi pantalla
+      input.value = '';
+    }
   }
 
   function renderMsg(data, type) {
@@ -347,18 +387,18 @@
     row.className = `msg-row ${type}`;
 
     row.innerHTML = `
-      <div style="font-size:0.6rem; color:var(--neon-purple); margin-bottom:2px; text-transform:uppercase; letter-spacing:1px;">
+      <div style="font-size:0.65rem; color:${type==='sent'?'var(--neon-purple)':'var(--neon-cyan)'}; margin-bottom:4px; text-transform:uppercase; font-weight:bold; letter-spacing:1px;">
         ${type === 'sent' ? 'Tú' : data.role}
       </div>
       <div class="msg-bubble">${data.text}</div>
-      <div style="font-size:0.5rem; color:#666; margin-top:2px; text-align:${type==='sent'?'right':'left'}">${data.time}</div>
+      <div style="font-size:0.55rem; color:#555; margin-top:4px; text-align:${type==='sent'?'right':'left'}">${data.time}</div>
     `;
 
     container.appendChild(row);
-    container.scrollTop = container.scrollHeight;
+    container.scrollTop = container.scrollHeight; // Auto-scroll al final
   }
 
-  // Enviar con Enter
+  // Enviar con la tecla Enter
   document.getElementById('msg-input').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
   });
